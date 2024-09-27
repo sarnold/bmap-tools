@@ -40,8 +40,6 @@ import tempfile
 import time
 import traceback
 
-import gpg
-
 from . import BmapCopy, BmapCreate, BmapHelpers, TransRead
 
 if sys.version_info < (3, 10):
@@ -144,6 +142,8 @@ def report_verification_results(context, sigs):
     argument contains the results of the 'gpg.verify()' function.
     """
 
+    import gpg  # noqa
+
     for sig in sigs:
         if (sig.summary & gpg.constants.SIGSUM_VALID) != 0:
             key = context.get_key(sig.fpr)
@@ -205,6 +205,15 @@ def verify_detached_bmap_signature(args, bmap_obj, bmap_path):
         sig_obj = tmp_obj
 
     try:
+        import gpg  # noqa
+    except ImportError:
+        error_out(
+            'cannot verify the signature because the python "gpg" '
+            "module is not installed on your system\nPlease, either "
+            "install the module or use --no-sig-verify"
+        )
+
+    try:
         context = gpg.Context()
         signature = io.FileIO(sig_obj.name)
         signed_data = io.FileIO(bmap_obj.name)
@@ -245,6 +254,16 @@ def verify_clearsign_bmap_signature(args, bmap_obj):
         )
 
     try:
+        import gpg  # noqa
+    except ImportError:
+        error_out(
+            'cannot verify the signature because the python "gpg"'
+            "module is not installed on your system\nCannot extract "
+            "block map from the bmap file which has clearsign format, "
+            "please, install the module"
+        )
+
+    try:
         context = gpg.Context()
         signature = io.FileIO(bmap_obj.name)
         plaintext = io.BytesIO()
@@ -256,7 +275,7 @@ def verify_clearsign_bmap_signature(args, bmap_obj):
             err[2].lower(),
         )
     except gpg.errors.BadSignatures as err:
-        error_out("discovered a BAD GPG signature: %s\n", sig_path)
+        error_out("discovered a BAD GPG signature: %s\n", err)
 
     if not args.no_sig_verify:
         if len(sigs) == 0:

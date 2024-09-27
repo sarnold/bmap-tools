@@ -1,3 +1,10 @@
+[build-system]  # these versions are valid on python 3.7 and up
+requires = [
+    "setuptools>=61",
+    "setuptools_scm>=7",
+]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "bmaptool"
 description = "BMAP tools"
@@ -50,27 +57,12 @@ test = [
 Homepage = "https://github.com/yoctoproject/bmaptool"
 Repository = "https://github.com/yoctoproject/bmaptool.git"
 Issues = "https://github.com/yoctoproject/bmaptool/issues"
-Changelog = "https://github.com/yoctoproject/bmaptool/blob/master/CHANGELOG.md"
+Changelog = "https://github.com/yoctoproject/bmaptool/blob/main/CHANGELOG.md"
 
 [project.scripts]
 bmaptool = "bmaptool.CLI:main"
 
-[build-system]
-requires = ["hatchling", "hatch-vcs"]
-build-backend = "hatchling.build"
-
-[tool.hatch.version]
-source = "vcs"
-
-[tool.hatch.build.targets.sdist]
-exclude = [
-  "/.github",
-  "/.tox",
-  "/contrib",
-]
-
-[tool.hatch.build.targets.wheel]
-packages = ["src/bmaptool"]
+[tool.setuptools_scm]
 
 [tool.pytest.ini_options]
 minversion = "7.0"
@@ -108,7 +100,7 @@ exclude_lines = [
 ]
 
 [tool.black]
-line-length = 88
+line-length = 90
 skip-string-normalization = true
 include = '\.py$'
 exclude = '''
